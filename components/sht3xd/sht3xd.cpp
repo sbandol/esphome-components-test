@@ -27,14 +27,29 @@ static const uint16_t SHT3XD_COMMAND_FETCH_DATA = 0xE000;
 
 void SHT3XDComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up SHT3xD...");
+  if (!this->write_command(SHT3XD_COMMAND_BREAK)) {
+    this->error_code_ = WRITE_BREAK_FAILED;
+    this->setup_status_code_ = this->setup_status_code_ + 1;
+    //this->status_has_warning();
+  } 
+  delay(2);
+  
+  if (!this->write_command(SHT3XD_COMMAND_SOFT_RESET)) {
+    this->error_code_ = WRITE_SOFT_RESET_FAILED;
+    this->setup_status_code_ = this->setup_status_code_ + 2;
+    //this->status_has_warning();
+  }
+  delay(10);
   
   uint16_t raw_serial_number[2]{0,0};
   if (!this->get_register(SHT3XD_COMMAND_READ_SERIAL_NUMBER_CLOCK_STRETCHING, raw_serial_number, 2, 2)) {
     this->read_serial_error_code_ = READ_SERIAL_STRETCHED_FAILED;
+    this->setup_status_code_ = this->setup_status_code_ + 4;
     if (!this->get_register(SHT3XD_COMMAND_READ_SERIAL_NUMBER, raw_serial_number, 2, 2)) {
       this->read_serial_error_code_ = READ_SERIAL_FAILED;
-      this->status_has_warning();
-      return;
+      this->setup_status_code_ = this->setup_status_code_ + 8;
+      //this->status_has_warning();
+      //return;
     }
   }
   
@@ -42,20 +57,23 @@ void SHT3XDComponent::setup() {
 
   if (!this->write_command(SHT3XD_COMMAND_CLEAR_STATUS)) {
     this->heater_setup_error_code_ = WRITE_CLEAR_FAILED;
-    this->mark_failed();
+    this->setup_status_code_ = this->setup_status_code_ + 16;
+    //this->mark_failed();
   }
   delay(2);
 
   if (!this->write_command(heater_enabled_ ? SHT3XD_COMMAND_HEATER_ENABLE : SHT3XD_COMMAND_HEATER_DISABLE)) {
     this->heater_setup_error_code_ = WRITE_HEATER_MODE_FAILED;
-    this->mark_failed();
+    this->setup_status_code_ = this->setup_status_code_ + 32;
+    //this->mark_failed();
     return;
   }
   delay(2);
   if (!this->get_register(SHT3XD_COMMAND_READ_STATUS, &this->status_register_, 1, 2)) {
       this->heater_setup_error_code_ = READ_STATUS_FAILED;
-      this->mark_failed();
-      return;
+      this->setup_status_code_ = this->setup_status_code_ + 64;
+      //this->mark_failed();
+      //return;
   }
 }
 
@@ -84,6 +102,8 @@ void SHT3XDComponent::dump_config() {
     default:
       break; 
   }
+
+  ESP_LOGD(TAG, "  Setup status code: %04x", this->setup_status_code_);
 
   if (this->read_serial_error_code_ == NO_READ_SERIAL_ERROR) {
     ESP_LOGD(TAG, "  Serial Number: 0x%08" PRIX32, this->serial_number_);
