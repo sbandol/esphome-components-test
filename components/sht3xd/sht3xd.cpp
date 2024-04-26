@@ -28,14 +28,14 @@ static const uint16_t SHT3XD_COMMAND_FETCH_DATA = 0xE000;
 void SHT3XDComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up SHT3xD...");
   if (!this->write_command(SHT3XD_COMMAND_BREAK)) {
-    this->error_code_ = WRITE_BREAK_FAILED;
+    //this->error_code_ = WRITE_BREAK_FAILED;
     this->setup_status_code_ = this->setup_status_code_ + 1;
     //this->status_has_warning();
   } 
   delay(2);
   
   if (!this->write_command(SHT3XD_COMMAND_SOFT_RESET)) {
-    this->error_code_ = WRITE_SOFT_RESET_FAILED;
+    //this->error_code_ = WRITE_SOFT_RESET_FAILED;
     this->setup_status_code_ = this->setup_status_code_ + 2;
     //this->status_has_warning();
   }
