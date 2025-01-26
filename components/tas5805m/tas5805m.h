@@ -21,6 +21,7 @@ class Tas5805mComponent : public Component, public i2c::I2CDevice {
   void set_tas5805m_state(bool deep_sleep);
 
  protected:
+   bool configure_registers(const tas5805m_cfg_reg_t* configuration, int size);
    bool tas5805m_write_byte(uint8_t a_register, uint8_t data);
 
    enum ErrorCode {
