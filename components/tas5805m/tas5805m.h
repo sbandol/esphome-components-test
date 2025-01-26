@@ -25,6 +25,7 @@ class Tas5805mComponent : public Component, public i2c::I2CDevice {
    } error_code_{NONE};
 
    uint8_t last_i2c_error_{0};
+   uint16_t number_configuration_registers_;
 };
 
 }  // namespace tas5805m
