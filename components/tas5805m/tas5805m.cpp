@@ -48,7 +48,7 @@ static const uint8_t DEVICE_CTRL_2_REGISTER = 0x03; // Device state control regi
 
 void Tas5805mComponent::setup() {
   this->number_configuration_registers_ = sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]);
-  if (!configure_registers(this->number_configuration_registers) {
+  if (!configure_registers(this->number_configuration_registers_) {
     this->error_code_ = WRITE_REGISTER_FAILED;
     this->mark_failed();
     return;
@@ -79,7 +79,7 @@ void Tas5805mComponent::dump_config() {
       ESP_LOGE(TAG, "  Write register failed with error code = %i",this->last_i2c_error_);
       break;
     case NONE:
-      ESP_LOGD(TAG, "  Registers configured: %i", this->number_configuration_registers);
+      ESP_LOGD(TAG, "  Registers configured: %i", this->number_configuration_registers_);
       ESP_LOGD(TAG, "  Setup successful");
       LOG_I2C_DEVICE(this);
       break;
