@@ -1,9 +1,12 @@
 #pragma once
 
-#include "tas5805m.h"
-
 namespace esphome {
 namespace tas5805m {
+
+struct tas5805m_cfg_reg_t {
+  uint8_t offset;
+  uint8_t value;
+};
 
 static const uint8_t CFG_META_DELAY = 254;
 
