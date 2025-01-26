@@ -35,6 +35,8 @@ class SHT3XDComponent : public PollingComponent, public sensirion_common::Sensir
     READ_STATUS_FAILED,
   } heater_setup_error_code_{NO_HEATER_SETUP_ERROR};
 
+  uint16_t setup_status_code_{0};
+
   uint16_t status_register_;
   
   sensor::Sensor *temperature_sensor_{nullptr};
