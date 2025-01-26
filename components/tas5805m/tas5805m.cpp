@@ -48,7 +48,7 @@ static const uint8_t DEVICE_CTRL_2_REGISTER = 0x03; // Device state control regi
 
 void Tas5805mComponent::setup() {
   this->number_configuration_registers_ = sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]);
-  if (!configure_registers(this->number_configuration_registers_) {
+  if (!configure_registers(this->number_configuration_registers_)) {
     this->error_code_ = WRITE_REGISTER_FAILED;
     this->mark_failed();
     return;
