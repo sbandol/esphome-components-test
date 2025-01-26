@@ -7,11 +7,6 @@
 namespace esphome {
 namespace tas5805m {
 
-struct tas5805m_cfg_reg_t {
-  uint8_t offset;
-  uint8_t value;
-};
-
 class Tas5805mComponent : public Component, public i2c::I2CDevice {
  public:
   void setup() override;

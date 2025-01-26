@@ -10,6 +10,11 @@ static const char *const TAG = "tas5805m";
 
 static const uint8_t CFG_META_DELAY = 254;
 
+struct tas5805m_cfg_reg_t {
+  uint8_t offset;
+  uint8_t value;
+};
+
 static const tas5805m_cfg_reg_t tas5805m_registers[] = {
 // RESET
     { 0x00, 0x00 },
