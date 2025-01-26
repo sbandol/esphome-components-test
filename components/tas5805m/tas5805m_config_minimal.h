@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tas8505m.h"
+#include "tas5805m.h"
 
 namespace esphome {
 namespace tas5805m {
