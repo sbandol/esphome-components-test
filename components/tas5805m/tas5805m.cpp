@@ -11,7 +11,7 @@ static const char *const TAG = "tas5805m";
 static const uint8_t DEVICE_CTRL_2_REGISTER = 0x03; // Device state control register
 
 void Tas5805mComponent::setup() {
-  if (!configure_registers(tas5805m_registers, sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0])) {
+  if (!configure_registers(sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]))) {
     this->error_code_ = WRITE_REGISTER_FAILED;
     this->mark_failed();
     return;
@@ -32,20 +32,20 @@ void Tas5805mComponent::setup() {
   // }
 }
 
-bool Tas5805mComponent::configure_registers(const tas5805m_cfg_reg_t* configuration, int size) {
-  int i = 0;
-  while (i < size) {
-    switch (configuration[i].offset) {
+bool Tas5805mComponent::configure_registers(uint16_t number_registers) {
+  uint16_t i = 0;
+  while (i < number_registers) {
+    switch (tas5805m_registers[i].offset) {
       case CFG_META_DELAY:
-        delay(configuration[i].value);
+        delay(tas5805m_registers[i].value);
         break;
       default:
-        if (!this->write_bytes(configuration[i].offset, configuration[i].value)) return false;
+        if (!this->tas5805m_write_byte(tas5805m_registers[i].offset, tas5805m_registers[i].value)) return false;
         break;
     }
     i++;
   }
-  return true
+  return true;
 }
 
 void Tas5805mComponent::dump_config() {
