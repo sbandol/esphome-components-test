@@ -22,7 +22,7 @@ void Tas5805mComponent::setup() {
     return;
   }
   this->set_gain(2);
-  this-set(volume(49);
+  this-set_volume(49);
 }
 
 bool Tas5805mComponent::configure_registers(uint16_t number_registers) {
@@ -34,12 +34,12 @@ bool Tas5805mComponent::configure_registers(uint16_t number_registers) {
         break;
       default:
         if (!this->tas5805m_write_byte(tas5805m_registers[i].offset, tas5805m_registers[i].value)) return false;
-        count++;
+        counter++;
         break;
     }
     i++;
   }
-  this->number_configuration_registers_ = count;
+  this->number_configuration_registers_ = counter;
   return true;
 }
 
