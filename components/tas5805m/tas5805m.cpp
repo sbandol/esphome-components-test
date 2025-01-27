@@ -15,16 +15,18 @@ static const uint8_t DIG_VOL_CTRL_REGISTER  = 0x4c;
 static const uint8_t AGAIN_REGISTER         = 0x54;
 
 void Tas5805mComponent::setup() {
-  this->number_configuration_registers_ = sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]);
-  if (!configure_registers(this->number_configuration_registers_)) {
+  uint16_t number_configurations = sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]);
+  if (!configure_registers(number_configurations)) {
     this->error_code_ = WRITE_REGISTER_FAILED;
     this->mark_failed();
     return;
   }
+  this->set_gain(2);
+  this-set(volume(49);
 }
 
 bool Tas5805mComponent::configure_registers(uint16_t number_registers) {
-  uint16_t i = 0;
+  uint16_t i, counter = 0;
   while (i < number_registers) {
     switch (tas5805m_registers[i].offset) {
       case CFG_META_DELAY:
@@ -32,10 +34,12 @@ bool Tas5805mComponent::configure_registers(uint16_t number_registers) {
         break;
       default:
         if (!this->tas5805m_write_byte(tas5805m_registers[i].offset, tas5805m_registers[i].value)) return false;
+        count++;
         break;
     }
     i++;
   }
+  this->number_configuration_registers_ = count;
   return true;
 }
 
@@ -56,7 +60,13 @@ void Tas5805mComponent::dump_config() {
   if (!this->get_volume(&volume)) {
     ESP_LOGD(TAG, "  error reading volume");
   } else {
-    ESP_LOGD(TAG, "  volume = %i",volume);
+    ESP_LOGD(TAG, "  tas5805m volume = %i",volume);
+  }
+  uint8_t gain;
+  if (!this->get_volume(&gain)) {
+    ESP_LOGD(TAG, "  error reading gain");
+  } else {
+    ESP_LOGD(TAG, "  tas5805m gain = %i",gain);
   }
 }
 
@@ -65,23 +75,32 @@ void Tas5805mComponent::set_tas5805m_state(bool deep_sleep) {
   this->tas5805m_write_byte(DEVICE_CTRL_2_REGISTER, mode);
 }
 
-// bool Tas5805mComponent::get_gain(uint8_t* volume) {
-//     uint8_t value = 0;
-//     esp_err_t ret = _read_byte(TAS5805M_AGAIN_REGISTER, &value);
-//     *volume = value << 3;
-//     return ret;
-// }
+// 0-255, where 0 = 0 Db, 255 = -15.5 Db
+bool Tas5805mComponent::get_gain(uint8_t* value) {
+    *value = 0;
+    uint8_t raw;
+    if (!this->tas5805m_read_byte(AGAIN_REGISTER, &raw)) return false;
+    *value = raw << 3;
+    return true;
+}
 
-bool Tas5805mComponent::get_volume(uint8_t* volume) {
-  *volume = 0;
-  return this->tas5805m_read_byte(DIG_VOL_CTRL_REGISTER, volume);
+// 0-255, where 0 = 0 Db, 255 = -15.5 Db
+bool Tas5805mComponent::set_gain(uint8_t value) {
+    return this->tas5805m_write_byte(AGAIN_REGISTER, value >> 3);
 }
 
 // 0-255, where 0 = 0 Db, 255 = mute
-// bool Tas5805mComponent::::setVolume(uint8_t value)
-// {
-//     uint8_t volume = value;
-//     return _write_byte(TAS5805M_DIG_VOL_CTRL_REGISTER, volume);
+bool Tas5805mComponent::get_volume(uint8_t* volume) {
+  *volume = 0;
+  uint8_t raw_value;
+  if(!this->tas5805m_read_byte(DIG_VOL_CTRL_REGISTER, &raw_value)) return false;
+  *volume = raw_value;
+  return true;
+}
+
+bool Tas5805mComponent::set_volume(uint8_t value) {
+  return this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, value);
+}
 
 bool Tas5805mComponent::tas5805m_write_byte(uint8_t a_register, uint8_t data) {
     i2c::ErrorCode error_code = this->write_register(a_register, &data, 1, true);
