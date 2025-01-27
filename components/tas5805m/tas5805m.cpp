@@ -21,8 +21,8 @@ void Tas5805mComponent::setup() {
     this->mark_failed();
     return;
   }
-  this->set_gain(10);
-  this->set_volume(49);
+  this->set_gain(2);
+  this->set_volume(47);
 }
 
 bool Tas5805mComponent::configure_registers(uint16_t number_registers) {
@@ -85,7 +85,11 @@ bool Tas5805mComponent::get_gain(uint8_t* value) {
     return true;
 }
 
-// 0-255, where 0 = 0 Db, 255 = -15.5 Db
+// Analog Gain Control , with 0.5dB one step
+// lower 5 bits controls the analog gain.
+// 00000: 0 dB (29.5V peak voltage)
+// 00001: -0.5db
+// 11111: -15.5 dB
 bool Tas5805mComponent::set_gain(uint8_t value) {
   uint8_t raw;
   this->get_gain(&raw);
@@ -94,7 +98,6 @@ bool Tas5805mComponent::set_gain(uint8_t value) {
   return this->tas5805m_write_byte(AGAIN_REGISTER, value);
 }
 
-// 0-255, where 0 = 0 Db, 255 = mute
 bool Tas5805mComponent::get_volume(uint8_t* volume) {
   *volume = 0;
   uint8_t raw;
@@ -103,6 +106,15 @@ bool Tas5805mComponent::get_volume(uint8_t* volume) {
   return true;
 }
 
+// controls both left and right channel digital volume
+// digital volume is 24 dB to -103 dB in -0.5 dB step
+// 00000000: +24.0 dB
+// 00000001: +23.5 dB
+// 00101111: +0.5 dB
+// 00110000: 0.0 dB
+// 00110001: -0.5 dB
+// 11111110: -103 dB
+// 11111111: Mute
 bool Tas5805mComponent::set_volume(uint8_t value) {
   return this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, value);
 }
