@@ -80,23 +80,26 @@ bool Tas5805mComponent::get_gain(uint8_t* value) {
     *value = 0;
     uint8_t raw;
     if (!this->tas5805m_read_byte(AGAIN_REGISTER, &raw)) return false;
-    *value = raw << 3;
+    // remove top 3 reserved bits
+    *value = raw & 0x1F;
     return true;
 }
 
 // 0-255, where 0 = 0 Db, 255 = -15.5 Db
 bool Tas5805mComponent::set_gain(uint8_t value) {
   uint8_t raw;
-  raw = value >> 3;
-  return this->tas5805m_write_byte(AGAIN_REGISTER, raw);
+  this->get_gain(&raw);
+  // keep top 3 reserved bits combine with bottom 5 gain bits
+  value = (raw & 0xE0) | (value & 0x1F);
+  return this->tas5805m_write_byte(AGAIN_REGISTER, value);
 }
 
 // 0-255, where 0 = 0 Db, 255 = mute
 bool Tas5805mComponent::get_volume(uint8_t* volume) {
   *volume = 0;
-  uint8_t raw_value;
-  if(!this->tas5805m_read_byte(DIG_VOL_CTRL_REGISTER, &raw_value)) return false;
-  *volume = raw_value;
+  uint8_t raw;
+  if(!this->tas5805m_read_byte(DIG_VOL_CTRL_REGISTER, &raw)) return false;
+  *volume = raw;
   return true;
 }
 
