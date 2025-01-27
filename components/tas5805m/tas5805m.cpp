@@ -22,7 +22,7 @@ void Tas5805mComponent::setup() {
     return;
   }
   this->set_gain(2);
-  this-set_volume(49);
+  this->set_volume(49);
 }
 
 bool Tas5805mComponent::configure_registers(uint16_t number_registers) {
