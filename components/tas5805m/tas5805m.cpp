@@ -21,7 +21,7 @@ void Tas5805mComponent::setup() {
     this->mark_failed();
     return;
   }
-  this->set_gain(2);
+  this->set_gain(10);
   this->set_volume(49);
 }
 
@@ -86,7 +86,9 @@ bool Tas5805mComponent::get_gain(uint8_t* value) {
 
 // 0-255, where 0 = 0 Db, 255 = -15.5 Db
 bool Tas5805mComponent::set_gain(uint8_t value) {
-    return this->tas5805m_write_byte(AGAIN_REGISTER, value >> 3);
+  uint8_t raw;
+  raw = value >> 3;
+  return this->tas5805m_write_byte(AGAIN_REGISTER, raw);
 }
 
 // 0-255, where 0 = 0 Db, 255 = mute
