@@ -53,7 +53,7 @@ void Tas5805mComponent::dump_config() {
       break;
   }
   uint8_t volume;
-  if (!this->get_volume(&volume) {
+  if (!this->get_volume(&volume)) {
     ESP_LOGD(TAG, "  error reading volume");
   } else {
     ESP_LOGD(TAG, "  volume = %i",volume);
