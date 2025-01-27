@@ -19,10 +19,12 @@ class Tas5805mComponent : public Component, public i2c::I2CDevice {
   float get_setup_priority() const override { return setup_priority::DATA; }
 
   void set_tas5805m_state(bool deep_sleep);
+  bool get_volume(uint8_t* volume);
 
  protected:
    bool configure_registers(uint16_t number_registers);
    bool tas5805m_write_byte(uint8_t a_register, uint8_t data);
+   bool tas5805m_read_byte(uint8_t register, uint8_t* data);
 
    enum ErrorCode {
      NONE = 0,
