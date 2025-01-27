@@ -19,7 +19,10 @@ class Tas5805mComponent : public Component, public i2c::I2CDevice {
   float get_setup_priority() const override { return setup_priority::DATA; }
 
   void set_tas5805m_state(bool deep_sleep);
+  bool get_gain(uint8_t* value);
+  bool set_gain(uint8_t value);
   bool get_volume(uint8_t* volume);
+  bool set_volume(uint8_t value);
 
  protected:
    bool configure_registers(uint16_t number_registers);
