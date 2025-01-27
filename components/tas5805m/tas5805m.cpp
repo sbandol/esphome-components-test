@@ -93,9 +93,9 @@ bool Tas5805mComponent::tas5805m_write_byte(uint8_t a_register, uint8_t data) {
     return true;
 }
 
-bool Tas5805mComponent::tas5805m_read_byte(uint8_t register, uint8_t* data) {
+bool Tas5805mComponent::tas5805m_read_byte(uint8_t a_register, uint8_t* data) {
   i2c::ErrorCode error_code;
-  error_code = write(&register, 1);
+  error_code = this->write(&a_register, 1);
   if (error_code != i2c::ERROR_OK) {
     ESP_LOGE(TAG, "  read register - first write error %i", error_code);
     this->last_i2c_error_ = (uint8_t)error_code;
