@@ -63,7 +63,7 @@ void Tas5805mComponent::dump_config() {
     ESP_LOGD(TAG, "  tas5805m volume = %i",volume);
   }
   uint8_t gain;
-  if (!this->get_volume(&gain)) {
+  if (!this->get_gain(&gain)) {
     ESP_LOGD(TAG, "  error reading gain");
   } else {
     ESP_LOGD(TAG, "  tas5805m gain = %i",gain);
