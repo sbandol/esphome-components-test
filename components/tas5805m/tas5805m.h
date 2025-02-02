@@ -37,7 +37,7 @@ class Tas5805mComponent : public audio_dac::AudioDac, public Component, public i
  protected:
    GPIOPin *enable_pin_{nullptr};
 
-   bool configure_registers(uint16_t number_registers);
+   bool configure_registers();
    bool set_raw_volume(uint8_t value);
    bool get_raw_volume(uint8_t* volume);
    bool tas5805m_write_byte(uint8_t a_register, uint8_t data);
