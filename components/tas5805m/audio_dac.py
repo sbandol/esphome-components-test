@@ -21,7 +21,7 @@ Tas5805mComponent = tas5805m_ns.class_("Tas5805mComponent", AudioDac, cg.Compone
 CONFIG_SCHEMA = (
     cv.Schema(
         {
-            cv.GenerateID(): cv.use_id(Tas5805mComponent),
+            cv.GenerateID(): cv.declare_id(Tas5805mComponent),
             cv.Required(CONF_ENABLE_PIN): pins.gpio_output_pin_schema,
         }
     )
