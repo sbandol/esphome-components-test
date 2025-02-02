@@ -15,14 +15,32 @@ static const uint8_t DIG_VOL_CTRL_REGISTER  = 0x4c;
 static const uint8_t AGAIN_REGISTER         = 0x54;
 
 void Tas5805mComponent::setup() {
-  uint16_t number_configurations = sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]);
-  if (!configure_registers(number_configurations)) {
-    this->error_code_ = WRITE_REGISTER_FAILED;
-    this->mark_failed();
-    return;
+  if (this->enable_pin_ != nullptr) {
+    // Set enable pin as OUTPUT and disable the enable pin
+    this->enable_pin_->setup();
+    this->enable_pin_->digital_write(false);
+    delay(10);
+    this->enable_pin_->digital_write(true);
+    //delay(10);
   }
-  this->set_gain(2);
-  this->set_volume(47);
+
+  this->set_timeout(100, [this]() {
+      uint16_t number_configurations = sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]);
+      if (!configure_registers(number_configurations)) {
+        this->error_code_ = WRITE_REGISTER_FAILED;
+        this->mark_failed();
+      }
+  });
+
+  // uint16_t number_configurations = sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]);
+  // if (!configure_registers(number_configurations)) {
+  //   this->error_code_ = WRITE_REGISTER_FAILED;
+  //   this->mark_failed();
+  //   return;
+  // }
+
+  // //this->set_gain(2);
+  // this->set_raw_volume(47);
 }
 
 bool Tas5805mComponent::configure_registers(uint16_t number_registers) {
@@ -57,7 +75,7 @@ void Tas5805mComponent::dump_config() {
       break;
   }
   uint8_t volume;
-  if (!this->get_volume(&volume)) {
+  if (!this->get_raw_volume(&volume)) {
     ESP_LOGD(TAG, "  error reading volume");
   } else {
     ESP_LOGD(TAG, "  tas5805m volume = %i",volume);
@@ -70,35 +88,55 @@ void Tas5805mComponent::dump_config() {
   }
 }
 
+
+bool Tas5805mComponent::set_volume(float value) {
+  return true;
+}
+
+bool Tas5805mComponent::set_mute_off() {
+  if (!this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, this->last_raw_volume_)) return false;
+  this->is_muted_ = false;
+  return true;
+}
+
+bool Tas5805mComponent::set_mute_on() {
+  uint8_t raw;
+  if (!this->get_raw_volume(&raw)) return false;
+  if (!this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, 0xFF)) return false;
+  this->last_raw_volume_ = raw;
+  this->is_muted_ = true;
+  return true;
+}
+
 void Tas5805mComponent::set_tas5805m_state(bool deep_sleep) {
   uint8_t mode = deep_sleep ? 0x00 : 0x03; // device state Deep Sleep or PLAY
   this->tas5805m_write_byte(DEVICE_CTRL_2_REGISTER, mode);
 }
 
 // 0-255, where 0 = 0 Db, 255 = -15.5 Db
-bool Tas5805mComponent::get_gain(uint8_t* value) {
-    *value = 0;
-    uint8_t raw;
-    if (!this->tas5805m_read_byte(AGAIN_REGISTER, &raw)) return false;
-    // remove top 3 reserved bits
-    *value = raw & 0x1F;
-    return true;
-}
+// bool Tas5805mComponent::get_gain(uint8_t* value) {
+//     *value = 0;
+//     uint8_t raw;
+//     if (!this->tas5805m_read_byte(AGAIN_REGISTER, &raw)) return false;
+//     // remove top 3 reserved bits
+//     *value = raw & 0x1F;
+//     return true;
+// }
 
 // Analog Gain Control , with 0.5dB one step
 // lower 5 bits controls the analog gain.
 // 00000: 0 dB (29.5V peak voltage)
 // 00001: -0.5db
 // 11111: -15.5 dB
-bool Tas5805mComponent::set_gain(uint8_t value) {
-  uint8_t raw;
-  this->get_gain(&raw);
-  // keep top 3 reserved bits combine with bottom 5 gain bits
-  value = (raw & 0xE0) | (value & 0x1F);
-  return this->tas5805m_write_byte(AGAIN_REGISTER, value);
-}
+// bool Tas5805mComponent::set_gain(uint8_t value) {
+//   uint8_t raw;
+//   this->get_gain(&raw);
+//   // keep top 3 reserved bits combine with bottom 5 gain bits
+//   value = (raw & 0xE0) | (value & 0x1F);
+//   return this->tas5805m_write_byte(AGAIN_REGISTER, value);
+// }
 
-bool Tas5805mComponent::get_volume(uint8_t* volume) {
+bool Tas5805mComponent::get_raw_volume(uint8_t* volume) {
   *volume = 0;
   uint8_t raw;
   if(!this->tas5805m_read_byte(DIG_VOL_CTRL_REGISTER, &raw)) return false;
@@ -115,7 +153,7 @@ bool Tas5805mComponent::get_volume(uint8_t* volume) {
 // 00110001: -0.5 dB
 // 11111110: -103 dB
 // 11111111: Mute
-bool Tas5805mComponent::set_volume(uint8_t value) {
+bool Tas5805mComponent::set_raw_volume(uint8_t value) {
   return this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, value);
 }
 
