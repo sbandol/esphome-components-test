@@ -46,7 +46,7 @@ bool Tas5805mComponent::configure_registers() {
   uint16_t i, counter = 0;
   uint16_t number_configurations = sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]);
 
-  while (i < number_registers) {
+  while (i < number_configurations) {
     switch (tas5805m_registers[i].offset) {
       case CFG_META_DELAY:
         delay(tas5805m_registers[i].value);
@@ -81,12 +81,12 @@ void Tas5805mComponent::dump_config() {
   } else {
     ESP_LOGD(TAG, "  tas5805m volume = %i",volume);
   }
-  uint8_t gain;
-  if (!this->get_gain(&gain)) {
-    ESP_LOGD(TAG, "  error reading gain");
-  } else {
-    ESP_LOGD(TAG, "  tas5805m gain = %i",gain);
-  }
+  // uint8_t gain;
+  // if (!this->get_gain(&gain)) {
+  //   ESP_LOGD(TAG, "  error reading gain");
+  // } else {
+  //   ESP_LOGD(TAG, "  tas5805m gain = %i",gain);
+  // }
 }
 
 
