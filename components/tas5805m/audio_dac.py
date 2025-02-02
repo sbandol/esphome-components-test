@@ -8,6 +8,8 @@ from esphome.const import (
     CONF_ENABLE_PIN,
 )
 
+from esphome import pins
+
 CODEOWNERS = ["@mrtoy-me"]
 DEPENDENCIES = ["i2c"]
 
