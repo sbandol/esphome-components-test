@@ -25,8 +25,7 @@ void Tas5805mComponent::setup() {
   }
 
   this->set_timeout(100, [this]() {
-      uint16_t number_configurations = sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]);
-      if (!configure_registers(number_configurations)) {
+      if (!configure_registers()) {
         this->error_code_ = WRITE_REGISTER_FAILED;
         this->mark_failed();
       }
@@ -43,8 +42,10 @@ void Tas5805mComponent::setup() {
   // this->set_raw_volume(47);
 }
 
-bool Tas5805mComponent::configure_registers(uint16_t number_registers) {
+bool Tas5805mComponent::configure_registers() {
   uint16_t i, counter = 0;
+  uint16_t number_configurations = sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]);
+
   while (i < number_registers) {
     switch (tas5805m_registers[i].offset) {
       case CFG_META_DELAY:
