@@ -14,7 +14,7 @@ struct tas5805m_cfg_reg_t {
   uint8_t value;
 };
 
-class Tas5805mComponent : AudioDac, public Component, public i2c::I2CDevice {
+class Tas5805mComponent : public audio_dac::AudioDac, public Component, public i2c::I2CDevice {
  public:
   void setup() override;
   void dump_config() override;
