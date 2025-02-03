@@ -90,9 +90,9 @@ void Tas5805mComponent::dump_config() {
 }
 
 
-bool Tas5805mComponent::set_volume(float value) {
-  return true;
-}
+//bool Tas5805mComponent::set_volume(float value) {
+//  return true;
+//}
 
 bool Tas5805mComponent::set_mute_off() {
   if (!this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, this->last_raw_volume_)) return false;
