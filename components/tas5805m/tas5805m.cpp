@@ -32,7 +32,8 @@ void Tas5805mComponent::setup() {
 }
 
 bool Tas5805mComponent::configure_registers() {
-  uint16_t i, counter = 0;
+  uint16_t i = 0;
+  uint16_t counter = 0;
   uint16_t number_configurations = sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]);
 
   while (i < number_configurations) {
