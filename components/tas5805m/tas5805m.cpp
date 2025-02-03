@@ -60,14 +60,14 @@ void Tas5805mComponent::dump_config() {
       ESP_LOGE(TAG, "  Write register failure with error code = %i",this->last_i2c_error_);
       break;
     case NONE:
-      ESP_LOGD(TAG, "  Registers configured: %i", this->number_configuration_registers_);
-      if (!this->get_raw_volume(&volume)) {
+      ESP_LOGD(TAG, "  Registers configured: %i", this->number_registers_configured_);
+      if (!this->get_digital_volume(&volume)) {
         ESP_LOGD(TAG, "  Error reading raw digital volume");
       } else {
         ESP_LOGD(TAG, "  Digital volume control: %i", volume);
       }
 
-      if (!this->get_gain(&gain)) {
+      if (!this->get_analog_gain(&gain)) {
         ESP_LOGD(TAG, "  Error reading analog gain");
       } else {
         ESP_LOGD(TAG, "  Analog gain control: %i", gain);
