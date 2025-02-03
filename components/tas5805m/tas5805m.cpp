@@ -49,7 +49,7 @@ bool Tas5805mComponent::configure_registers() {
     i++;
   }
   this->number_registers_configured_ = counter;
-  this->set_digital_volume(0x33);
+  this->set_digital_volume(0x3F);
   return true;
 }
 
