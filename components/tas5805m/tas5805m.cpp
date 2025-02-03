@@ -21,7 +21,6 @@ void Tas5805mComponent::setup() {
     this->enable_pin_->digital_write(false);
     delay(10);
     this->enable_pin_->digital_write(true);
-    //delay(10);
   }
 
   this->set_timeout(100, [this]() {
@@ -30,16 +29,6 @@ void Tas5805mComponent::setup() {
         this->mark_failed();
       }
   });
-
-  // uint16_t number_configurations = sizeof(tas5805m_registers) / sizeof(tas5805m_registers[0]);
-  // if (!configure_registers(number_configurations)) {
-  //   this->error_code_ = WRITE_REGISTER_FAILED;
-  //   this->mark_failed();
-  //   return;
-  // }
-
-  // //this->set_gain(2);
-  // this->set_raw_volume(47);
 }
 
 bool Tas5805mComponent::configure_registers() {
@@ -58,41 +47,41 @@ bool Tas5805mComponent::configure_registers() {
     }
     i++;
   }
-  this->number_configuration_registers_ = counter;
+  this->number_registers_configured_ = counter;
   return true;
 }
 
 void Tas5805mComponent::dump_config() {
   ESP_LOGCONFIG(TAG, "Tas5805m:");
+  uint8_t volume, gain;
 
   switch (this->error_code_) {
     case WRITE_REGISTER_FAILED:
-      ESP_LOGE(TAG, "  Write register failed with error code = %i",this->last_i2c_error_);
+      ESP_LOGE(TAG, "  Write register failure with error code = %i",this->last_i2c_error_);
       break;
     case NONE:
       ESP_LOGD(TAG, "  Registers configured: %i", this->number_configuration_registers_);
+      if (!this->get_raw_volume(&volume)) {
+        ESP_LOGD(TAG, "  Error reading raw digital volume");
+      } else {
+        ESP_LOGD(TAG, "  Digital volume control: %i", volume);
+      }
+
+      if (!this->get_gain(&gain)) {
+        ESP_LOGD(TAG, "  Error reading analog gain");
+      } else {
+        ESP_LOGD(TAG, "  Analog gain control: %i", gain);
+      }
       ESP_LOGD(TAG, "  Setup successful");
       LOG_I2C_DEVICE(this);
       break;
   }
-  uint8_t volume;
-  if (!this->get_raw_volume(&volume)) {
-    ESP_LOGD(TAG, "  error reading volume");
-  } else {
-    ESP_LOGD(TAG, "  tas5805m volume = %i",volume);
-  }
-  // uint8_t gain;
-  // if (!this->get_gain(&gain)) {
-  //   ESP_LOGD(TAG, "  error reading gain");
-  // } else {
-  //   ESP_LOGD(TAG, "  tas5805m gain = %i",gain);
-  // }
 }
 
 
 bool Tas5805mComponent::set_volume(float value) {
   uint8_t raw = (uint8_t)((100.0-(value*100.0)) * 2.54);
-  ESP_LOGD(TAG, "  tas5805m volume = %i",raw);
+  ESP_LOGD(TAG, "  set digital volume test = %i",raw);
   return true;
 }
 
@@ -111,36 +100,42 @@ bool Tas5805mComponent::set_mute_on() {
   return true;
 }
 
+void Tas5805mComponent::set_deep_sleep_mode() {
+  this->tas5805m_write_byte(DEVICE_CTRL_2_REGISTER, 0x00);
+}
+
+void Tas5805mComponent::set_play_mode() {
+  this->tas5805m_write_byte(DEVICE_CTRL_2_REGISTER, 0x03);
+}
+
 void Tas5805mComponent::set_tas5805m_state(bool deep_sleep) {
-  uint8_t mode = deep_sleep ? 0x00 : 0x03; // device state Deep Sleep or PLAY
+  uint8_t mode = deep_sleep ? 0x00 : 0x03; // device state either Deep Sleep or PLAY
   this->tas5805m_write_byte(DEVICE_CTRL_2_REGISTER, mode);
 }
 
 // 0-255, where 0 = 0 Db, 255 = -15.5 Db
-// bool Tas5805mComponent::get_gain(uint8_t* value) {
-//     *value = 0;
-//     uint8_t raw;
-//     if (!this->tas5805m_read_byte(AGAIN_REGISTER, &raw)) return false;
-//     // remove top 3 reserved bits
-//     *value = raw & 0x1F;
-//     return true;
-// }
+bool Tas5805mComponent::get_analog_gain(uint8_t* value) {
+    uint8_t raw;
+    if (!this->tas5805m_read_byte(AGAIN_REGISTER, &raw)) return false;
+    // remove top 3 reserved bits
+    *value = raw & 0x1F;
+    return true;
+}
 
 // Analog Gain Control , with 0.5dB one step
 // lower 5 bits controls the analog gain.
 // 00000: 0 dB (29.5V peak voltage)
 // 00001: -0.5db
 // 11111: -15.5 dB
-// bool Tas5805mComponent::set_gain(uint8_t value) {
-//   uint8_t raw;
-//   this->get_gain(&raw);
-//   // keep top 3 reserved bits combine with bottom 5 gain bits
-//   value = (raw & 0xE0) | (value & 0x1F);
-//   return this->tas5805m_write_byte(AGAIN_REGISTER, value);
-// }
+bool Tas5805mComponent::set_analog_gain(uint8_t value) {
+  uint8_t raw;
+  this->get_gain(&raw);
+  // keep top 3 reserved bits combine with bottom 5 gain bits of new gain
+  value = (raw & 0xE0) | (value & 0x1F);
+  return this->tas5805m_write_byte(AGAIN_REGISTER, value);
+}
 
-bool Tas5805mComponent::get_raw_volume(uint8_t* volume) {
-  *volume = 0;
+bool Tas5805mComponent::get_digital_volume(uint8_t* volume) {
   uint8_t raw;
   if(!this->tas5805m_read_byte(DIG_VOL_CTRL_REGISTER, &raw)) return false;
   *volume = raw;
@@ -156,7 +151,7 @@ bool Tas5805mComponent::get_raw_volume(uint8_t* volume) {
 // 00110001: -0.5 dB
 // 11111110: -103 dB
 // 11111111: Mute
-bool Tas5805mComponent::set_raw_volume(uint8_t value) {
+bool Tas5805mComponent::set_digital_volume(uint8_t value) {
   return this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, value);
 }
 
