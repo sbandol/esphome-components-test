@@ -90,9 +90,11 @@ void Tas5805mComponent::dump_config() {
 }
 
 
-//bool Tas5805mComponent::set_volume(float value) {
-//  return true;
-//}
+bool Tas5805mComponent::set_volume(float value) {
+  uint8_t raw = (uint8_t)((100.0-value) * 2.54);
+  ESP_LOGD(TAG, "  tas5805m volume = %i",raw);
+  return true;
+}
 
 bool Tas5805mComponent::set_mute_off() {
   if (!this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, this->last_raw_volume_)) return false;
