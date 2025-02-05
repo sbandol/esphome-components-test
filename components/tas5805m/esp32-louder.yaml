@@ -90,7 +90,7 @@ interval:
     then:
       - if:
           condition:
-            - switch.is_on: amp
+            - switch.is_on: enable_louder
             - for:
                 time: 30s
                 condition:
