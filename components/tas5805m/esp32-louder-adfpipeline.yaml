@@ -128,20 +128,23 @@ media_player:
     pipeline:
       - self
       - adf_i2s_out
+    on_play:
+      - switch.turn_on: enable_louder
 
 switch:
   - platform: template
-    name: Louder TAS5805 Deep Sleep Mode
+    name: Enable Louder-ESP32
+    id: enable_louder
     optimistic: true
     turn_on_action:
       - lambda: !lambda |-
-          id(tas5805_dac).set_deep_sleep_on();
+          id(tas5805_dac).set_deep_sleep_off();
     turn_off_action:
       - lambda: !lambda |-
-          id(tas5805_dac).set_deep_sleep_off();
+          id(tas5805_dac).set_deep_sleep_on();
 
   - platform: template
-    name: LOUDER TAS5805 Mute
+    name: Mute Louder-ESP32
     optimistic: true
     turn_on_action:
       - lambda: !lambda |-

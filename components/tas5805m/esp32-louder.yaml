@@ -70,30 +70,32 @@ media_player:
     dac_type: external
     i2s_dout_pin: GPIO16
     mode: stereo
+    on_play:
+      - switch.turn_on: enable_louder
 
 switch:
   - platform: template
-    name: Louder TAS5805 Deep Sleep Mode
+    name: Enable Louder-ESP32
+    id: enable_louder
     optimistic: true
     turn_on_action:
-      - lambda: !lambda |-
-          id(tas5805_dac).set_deep_sleep_on();
-    turn_off_action:
       - lambda: !lambda |-
           id(tas5805_dac).set_deep_sleep_off();
-
-  - platform: template
-    name: LOUDER TAS5805 Mute
-    optimistic: true
-    turn_on_action:
-      - lambda: !lambda |-
-          id(tas5805_dac).set_mute_on();
     turn_off_action:
       - lambda: !lambda |-
-          id(tas5805_dac).set_mute_off();
+          id(tas5805_dac).set_deep_sleep_on();
 
-binary_sensor:
-  - platform: template
-    name: Louder TAS5805 Is Muted
-    lambda: |-
-      return id(tas5805_dac).is_muted();
+interval:
+  - interval: 1min
+    then:
+      - if:
+          condition:
+            - switch.is_on: amp
+            - for:
+                time: 30s
+                condition:
+                  or:
+                    - media_player.is_idle: louder_mediaplayer
+                    - media_player.is_paused: louder_mediaplayer
+          then:
+            - switch.turn_off: enable_louder
