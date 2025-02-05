@@ -10,7 +10,7 @@ esphome:
     then:
     # Set a volume limit just to be safe...
     - media_player.volume_set:
-        id: adf_media_player
+        id: louder_mediaplayer
         volume: 5%
 esp32:
   board: esp32-s3-devkitc-1
@@ -68,11 +68,11 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: "cnCF2KgiX2TSVVvXZ1kx1VK67WENy45Xq8bHMBFXCzk="
+    key: !secret louder_api
 
 ota:
   - platform: esphome
-    password: "3ec3a8c28249fa8895d1a4b4d6db79e6"
+    password: !secret louder_ota
 
 wifi:
   ssid: !secret wifi_ssid
@@ -103,6 +103,7 @@ i2c:
 
 audio_dac:
   - platform: tas5805m
+    id: tas5805_dac
     i2c_id: internal_i2c
     enable_pin: GPIO17
 
@@ -120,10 +121,37 @@ adf_pipeline:
 
 media_player:
   - platform: adf_pipeline
-    id: adf_media_player
-    name: player
+    id: louder_mediaplayer
+    name: louder mediaplayer
     keep_pipeline_alive: false
     internal: false
     pipeline:
       - self
       - adf_i2s_out
+
+switch:
+  - platform: template
+    name: Louder TAS5805 Deep Sleep Mode
+    optimistic: true
+    turn_on_action:
+      - lambda: !lambda |-
+          id(tas5805_dac).set_deep_sleep_on();
+    turn_off_action:
+      - lambda: !lambda |-
+          id(tas5805_dac).set_deep_sleep_off();
+
+  - platform: template
+    name: LOUDER TAS5805 Mute
+    optimistic: true
+    turn_on_action:
+      - lambda: !lambda |-
+          id(tas5805_dac).set_mute_on();
+    turn_off_action:
+      - lambda: !lambda |-
+          id(tas5805_dac).set_mute_off();
+
+binary_sensor:
+  - platform: template
+    name: Louder TAS5805 Is Muted
+    lambda: |-
+      return id(tas5805_dac).is_muted();
