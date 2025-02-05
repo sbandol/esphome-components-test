@@ -122,7 +122,7 @@ adf_pipeline:
 media_player:
   - platform: adf_pipeline
     id: louder_mediaplayer
-    name: louder mediaplayer
+    name: Louder-ESP32 mediaplayer
     keep_pipeline_alive: false
     internal: false
     pipeline:
@@ -155,6 +155,6 @@ switch:
 
 binary_sensor:
   - platform: template
-    name: Louder TAS5805 Is Muted
+    name: Louder-ESP32 Is Muted
     lambda: |-
       return id(tas5805_dac).is_muted();
