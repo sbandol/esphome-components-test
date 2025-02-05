@@ -102,12 +102,16 @@ bool Tas5805mComponent::set_mute_on() {
   return true;
 }
 
-void Tas5805mComponent::set_deep_sleep_mode() {
-  this->tas5805m_write_byte(DEVICE_CTRL_2_REGISTER, 0x00);
+bool Tas5805mComponent::set_deep_sleep_on() {
+  if (this->deep_sleep_mode_) return true; //already in deep sleep
+  this->deep_sleep_mode_ = this->tas5805m_write_byte(DEVICE_CTRL_2_REGISTER, 0x00);
+  return this->deep_sleep_mode_;
 }
 
-void Tas5805mComponent::set_play_mode() {
-  this->tas5805m_write_byte(DEVICE_CTRL_2_REGISTER, 0x03);
+void Tas5805mComponent::set_deep_sleep_off() {
+  if (!this->deep_sleep_mode_) return true; // already not in deep sleep
+  this->deep_sleep_mode_ = (!this->tas5805m_write_byte(DEVICE_CTRL_2_REGISTER, 0x03));
+  return this->deep_sleep_mode_;
 }
 
 void Tas5805mComponent::set_tas5805m_state(bool deep_sleep) {

@@ -82,10 +82,10 @@ switch:
     optimistic: true
     turn_on_action:
       - lambda: !lambda |-
-          id(tas5805_dac).set_deep_sleep_mode();
+          id(tas5805_dac).set_deep_sleep_on();
     turn_off_action:
       - lambda: !lambda |-
-          id(tas5805_dac).set_play_mode();
+          id(tas5805_dac).set_deep_sleep_off();
 
   - platform: template
     name: LOUDER TAS5805 Mute
