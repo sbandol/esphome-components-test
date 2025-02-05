@@ -108,7 +108,7 @@ bool Tas5805mComponent::set_deep_sleep_on() {
   return this->deep_sleep_mode_;
 }
 
-void Tas5805mComponent::set_deep_sleep_off() {
+bool Tas5805mComponent::set_deep_sleep_off() {
   if (!this->deep_sleep_mode_) return true; // already not in deep sleep
   this->deep_sleep_mode_ = (!this->tas5805m_write_byte(DEVICE_CTRL_2_REGISTER, 0x03));
   return this->deep_sleep_mode_;
