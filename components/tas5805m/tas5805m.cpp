@@ -90,6 +90,7 @@ bool Tas5805mComponent::set_volume(float value) {
 bool Tas5805mComponent::set_mute_off() {
   if (!this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, this->last_raw_volume_)) return false;
   this->is_muted_ = false;
+  ESP_LOGD(TAG, "  tas5805m mute off");
   return true;
 }
 
@@ -99,18 +100,21 @@ bool Tas5805mComponent::set_mute_on() {
   if (!this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, 0xFF)) return false;
   this->last_raw_volume_ = raw;
   this->is_muted_ = true;
+  ESP_LOGD(TAG, "  tas5805m mute on");
   return true;
 }
 
 bool Tas5805mComponent::set_deep_sleep_on() {
   if (this->deep_sleep_mode_) return true; //already in deep sleep
   this->deep_sleep_mode_ = this->tas5805m_write_byte(DEVICE_CTRL_2_REGISTER, 0x00);
+  ESP_LOGD(TAG, "  tas5805m deep sleep on");
   return this->deep_sleep_mode_;
 }
 
 bool Tas5805mComponent::set_deep_sleep_off() {
   if (!this->deep_sleep_mode_) return true; // already not in deep sleep
   this->deep_sleep_mode_ = (!this->tas5805m_write_byte(DEVICE_CTRL_2_REGISTER, 0x03));
+  ESP_LOGD(TAG, "  tas5805m deep sleep off");
   return this->deep_sleep_mode_;
 }
 
@@ -160,6 +164,7 @@ bool Tas5805mComponent::get_digital_volume(uint8_t* volume) {
 // 11111110: -103 dB
 // 11111111: Mute
 bool Tas5805mComponent::set_digital_volume(uint8_t value) {
+  ESP_LOGD(TAG, "  tas5805m set digital volume %i", value);
   return this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, value);
 }
 
