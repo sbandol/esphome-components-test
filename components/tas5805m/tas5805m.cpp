@@ -23,7 +23,7 @@ void Tas5805mComponent::setup() {
     this->enable_pin_->digital_write(true);
   }
 
-  this->set_timeout(200, [this]() {
+  this->set_timeout(100, [this]() {
       if (!configure_registers()) {
         this->error_code_ = WRITE_REGISTER_FAILED;
         this->mark_failed();
