@@ -18,7 +18,7 @@ class Tas5805mComponent : public audio_dac::AudioDac, public Component, public i
  public:
   void setup() override;
   void dump_config() override;
-  float get_setup_priority() const override { return setup_priority::BUS; }
+  float get_setup_priority() const override { return setup_priority::IO; }
 
   void set_enable_pin(GPIOPin *enable) { this->enable_pin_ = enable; }
 
