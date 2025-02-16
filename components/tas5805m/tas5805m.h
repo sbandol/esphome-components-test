@@ -34,11 +34,11 @@ class Tas5805mComponent : public audio_dac::AudioDac, public Component, public i
   bool get_analog_gain(uint8_t* value);
   bool get_digital_volume(uint8_t* volume);
 
+
  protected:
    GPIOPin *enable_pin_{nullptr};
 
    bool configure_registers();
-
    bool set_digital_volume(uint8_t value);
    bool set_analog_gain(uint8_t value);
 
