@@ -49,7 +49,7 @@ bool Tas5805mComponent::configure_registers() {
     i++;
   }
   this->number_registers_configured_ = counter;
-  this->set_digital_volume(0x3F);
+  this->set_digital_volume(48); // should already be configured but set to 0dB just to make sure
   return true;
 }
 
