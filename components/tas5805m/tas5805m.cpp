@@ -80,10 +80,14 @@ void Tas5805mComponent::dump_config() {
   }
 }
 
-
+// must be float range -103 to 24dB
 bool Tas5805mComponent::set_volume(float value) {
-  uint8_t raw = (uint8_t)((100.0-value) * 2.54);
-  this->set_digital_volume(raw);
+  if ((value > 24) | (value < -103)) {
+    ESP_LOGD(TAG, "  invalid digital volume dB = %3.0f",value);
+    return false;
+  }
+  uint8_t raw = (uint8_t)(2.0*(value-24.0));
+  //this->set_digital_volume(raw);
   ESP_LOGD(TAG, "  set digital volume test = %i",raw);
   return true;
 }
