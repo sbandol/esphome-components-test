@@ -24,7 +24,7 @@ class Tas5805mComponent : public audio_dac::AudioDac, public Component, public i
 
   float volume() override {return (float)this->last_raw_volume_; }
   bool set_volume(float value) override;
-  bool set_gain(float value);
+  //bool set_gain(float value);
 
   bool set_mute_off() override;
   bool set_mute_on() override;
@@ -42,7 +42,7 @@ class Tas5805mComponent : public audio_dac::AudioDac, public Component, public i
 
    bool configure_registers();
    bool set_digital_volume(uint8_t value);
-   bool set_analog_gain(uint8_t value);
+   //bool set_analog_gain(uint8_t value);
 
    void set_tas5805m_state(bool deep_sleep);
 

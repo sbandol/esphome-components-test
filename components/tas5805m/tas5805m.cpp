@@ -92,16 +92,16 @@ bool Tas5805mComponent::set_volume(float value) {
   return true;
 }
 // must be float range -15.5 to 0dB
-bool Tas5805mComponent::set_gain(float value) {
-  if ((value > 0.0) | (value < -15.5)) {
-    ESP_LOGD(TAG, "  invalid analog gain dB = %3.0f", value);
-    return false;
-  }
-  uint8_t raw = (uint8_t)(-2.0 * value);
-  this->set_digital_volume(raw);
-  ESP_LOGD(TAG, "  raw digital volume = %i", raw);
-  return true;
-}
+// bool Tas5805mComponent::set_gain(float value) {
+//   if ((value > 0.0) | (value < -15.5)) {
+//     ESP_LOGD(TAG, "  invalid analog gain dB = %3.0f", value);
+//     return false;
+//   }
+//   uint8_t raw = (uint8_t)(-2.0 * value);
+//   this->set_digital_volume(raw);
+//   ESP_LOGD(TAG, "  raw digital volume = %i", raw);
+//   return true;
+// }
 
 bool Tas5805mComponent::set_mute_off() {
   if (!this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, this->last_raw_volume_)) return false;
@@ -153,15 +153,15 @@ bool Tas5805mComponent::get_analog_gain(uint8_t* value) {
 // 00000: 0 dB (29.5V peak voltage)
 // 00001: -0.5db
 // 11111: -15.5 dB
-bool Tas5805mComponent::set_analog_gain(uint8_t value) {
-  uint8_t raw;
-  if (value > 0x1F) return false;
-  if (!this->get_analog_gain(&raw)) return false;
+// bool Tas5805mComponent::set_analog_gain(uint8_t value) {
+//   uint8_t raw;
+//   if (value > 0x1F) return false;
+//   if (!this->get_analog_gain(&raw)) return false;
 
-  // keep top 3 reserved bits combine with lower 5 bits of new gain
-  value = (raw & 0xE0) | (value & 0x1F);
-  return this->tas5805m_write_byte(AGAIN_REGISTER, value);
-}
+//   // keep top 3 reserved bits combine with lower 5 bits of new gain
+//   value = (raw & 0xE0) | (value & 0x1F);
+//   return this->tas5805m_write_byte(AGAIN_REGISTER, value);
+// }
 
 bool Tas5805mComponent::get_digital_volume(uint8_t* volume) {
   uint8_t raw;
