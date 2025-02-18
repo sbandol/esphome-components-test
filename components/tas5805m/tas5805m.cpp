@@ -91,9 +91,9 @@ bool Tas5805mComponent::set_volume(float value) {
   ESP_LOGD(TAG, "  raw digital volume = %i", raw);
   return true;
 }
-
+// must be float range -15.5 to 0dB
 bool Tas5805mComponent::set_gain(float value) {
-  if ((value > 0.0 | (value < -15.5)) {
+  if ((value > 0.0) | (value < -15.5)) {
     ESP_LOGD(TAG, "  invalid analog gain dB = %3.0f", value);
     return false;
   }
