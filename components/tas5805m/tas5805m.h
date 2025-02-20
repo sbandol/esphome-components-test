@@ -22,8 +22,8 @@ class Tas5805mComponent : public audio_dac::AudioDac, public Component, public i
 
   void set_enable_pin(GPIOPin *enable) { this->enable_pin_ = enable; }
 
-  float volume() override { return this->volume_; }
-  bool set_volume(float value) override;
+  // float volume() override { return this->volume_; }
+  // bool set_volume(float value) override;
 
   bool set_mute_off() override;
   bool set_mute_on() override;
