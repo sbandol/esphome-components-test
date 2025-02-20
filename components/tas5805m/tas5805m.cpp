@@ -33,7 +33,7 @@ void Tas5805mComponent::setup() {
         this->mark_failed();
       }
       else {
-        this->last_raw_volume_ = raw;
+        this->raw_volume_ = raw;
       }
   });
 }
@@ -72,7 +72,7 @@ void Tas5805mComponent::dump_config() {
       break;
     case NONE:
       ESP_LOGD(TAG, "  Registers configured: %i", this->number_registers_configured_);
-      ESP_LOGD(TAG, "  Digital volume control: %i", this->last_raw_volume_);
+      ESP_LOGD(TAG, "  Digital volume control: %i", this->raw_volume_);
       ESP_LOGD(TAG, "  Setup successful");
       LOG_I2C_DEVICE(this);
       break;
@@ -90,7 +90,7 @@ bool Tas5805mComponent::set_volume(float volume) {
 }
 
 bool Tas5805mComponent::set_mute_off() {
-  if (!this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, this->last_raw_volume_)) return false;
+  if (!this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, this->raw_volume_)) return false;
   this->is_muted_ = false;
   ESP_LOGD(TAG, "  tas5805m mute off");
   return true;
@@ -100,7 +100,7 @@ bool Tas5805mComponent::set_mute_on() {
   uint8_t raw;
   if (!this->get_digital_volume(&raw)) return false;
   if (!this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, 0xFF)) return false;
-  this->last_raw_volume_ = raw;
+  this->raw_volume_ = raw;
   this->is_muted_ = true;
   ESP_LOGD(TAG, "  tas5805m mute on");
   return true;
