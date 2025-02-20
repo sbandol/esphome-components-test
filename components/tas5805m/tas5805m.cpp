@@ -79,15 +79,14 @@ void Tas5805mComponent::dump_config() {
   }
 }
 
-// bool Tas5805mComponent::set_volume(float volume) {
-//   this->volume_ = clamp<float>(volume, 0.0, 1.0);
-//   uint8_t raw = (uint8_t)((1.0 - this->volume_) * 254);
-//   uint8_t test_raw = remap<uint8_t, float>(this->volume_, 0.0f, 1.0f, 254, 0);
-//   this->set_digital_volume(raw);
-//   ESP_LOGD(TAG, "  raw digital volume = %i", raw);
-//   ESP_LOGD(TAG, "  map raw digital volume = %i", test_raw);
-//   return true;
-// }
+bool Tas5805mComponent::set_volume(float volume) {
+  this->volume_ = clamp<float>(volume, 0.0, 1.0);
+  //uint8_t raw = (uint8_t)((1.0 - this->volume_) * 254);
+  uint8_t raw = remap<uint8_t, float>(this->volume_, 0.0f, 1.0f, 254, 0);
+  //this->set_digital_volume(raw);
+  ESP_LOGD(TAG, "  raw digital volume = %i", raw);
+  return true;
+}
 
 bool Tas5805mComponent::set_mute_off() {
   if (!this->tas5805m_write_byte(DIG_VOL_CTRL_REGISTER, this->raw_volume_)) return false;
